@@ -247,50 +247,77 @@ Testing algorithm with different key values.
 
 ## PROGRAM:
 ~~~
-#include<stdio.h>
-#include<conio.h>
-#include<string.h>
-int main(){
-unsigned int a[3][3]={{6,24,1},{13,16,10},{20,17,15}};
-unsigned int b[3][3]={{8,5,10},{21,8,21},{21,12,8}};
-int i,j, t=0;
-unsigned int c[20],d[20];
-char msg[20];
-printf("Enter plain text: ");
-scanf("%s",msg);
-for(i=0;i<strlen(msg);i++)
-{
-c[i]=msg[i]-65;
-unsigned int a[3][3]={{6,24,1},{13,16,10},{20,17,15}};
-unsigned int b[3][3]={{8,5,10},{21,8,21},{21,12,8}};
-printf("%d ",c[i]);
+#include <stdio.h>
+#include <string.h>
+
+#define MATRIX_SIZE 3
+
+// Function to print matrix
+void printMatrix(unsigned int matrix[MATRIX_SIZE][MATRIX_SIZE]) {
+    for (int i = 0; i < MATRIX_SIZE; i++) {
+        for (int j = 0; j < MATRIX_SIZE; j++) {
+            printf("%d ", matrix[i][j]);
+        }
+        printf("\n");
+    }
 }
-for(i=0;i<3;i++)
-{ t=0;
-for(j=0;j<3;j++)
-{
-t=t+(a[i][j]*c[j]);
+
+// Function to multiply matrix and vector
+void multiplyMatrixVector(unsigned int matrix[MATRIX_SIZE][MATRIX_SIZE], unsigned int vector[MATRIX_SIZE], unsigned int result[MATRIX_SIZE]) {
+    for (int i = 0; i < MATRIX_SIZE; i++) {
+        unsigned int sum = 0;
+        for (int j = 0; j < MATRIX_SIZE; j++) {
+            sum += matrix[i][j] * vector[j];
+        }
+        result[i] = sum % 26;
+    }
 }
-d[i]=t%26;
+
+int main() {
+    unsigned int a[MATRIX_SIZE][MATRIX_SIZE] = {{6, 24, 1}, {13, 16, 10}, {20, 17, 15}};
+    unsigned int b[MATRIX_SIZE][MATRIX_SIZE] = {{8, 5, 10}, {21, 8, 21}, {21, 12, 8}};
+    
+    unsigned int c[MATRIX_SIZE], d[MATRIX_SIZE];
+    char msg[20];
+    
+    printf("Enter plain text (up to 3 characters): ");
+    scanf("%s", msg);
+    
+    // Ensure message length is 3 or less
+    int msgLen = strlen(msg);
+    if (msgLen > MATRIX_SIZE) {
+        printf("Message too long. Limiting to %d characters.\n", MATRIX_SIZE);
+        msgLen = MATRIX_SIZE;
+    }
+    
+    // Convert message to numeric values
+    for (int i = 0; i < msgLen; i++) {
+        c[i] = msg[i] - 65;
+        printf("%d ", c[i]);
+    }
+    printf("\n");
+    
+    // Encrypt
+    multiplyMatrixVector(a, c, d);
+    
+    printf("Encrypted Cipher Text: ");
+    for (int i = 0; i < MATRIX_SIZE; i++) {
+        printf("%c ", d[i] + 65);
+    }
+    printf("\n");
+    
+    // Decrypt
+    multiplyMatrixVector(b, d, c);
+    
+    printf("Decrypted Cipher Text: ");
+    for (int i = 0; i < MATRIX_SIZE; i++) {
+        printf("%c ", c[i] + 65);
+    }
+    printf("\n");
+    
+    return 0;
 }
-printf("\nEncrypted Cipher Text :");
-for(i=0;i<3;i++)
-printf(" %c",d[i]+65);
-for(i=0;i<3;i++)
-{
-t=0;
-for(j=0;j<3;j++)
-{
-t=t+(b[i][j]*d[j]);
-}
-c[i]=t%26;
-}
-printf("\nDecrypted Cipher Text :");
-for(i=0;i<3;i++)
-printf(" %c",c[i]+65);
-getch();
-return 0;
-}
+
 ~~~
 ## OUTPUT:
 ![Screenshot 2024-09-04 140509](https://github.com/user-attachments/assets/db92d069-a4b8-4f34-ac06-27c3c59dea78)
@@ -326,66 +353,92 @@ Testing algorithm with different key values.
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
+
 void encipher();
 void decipher();
-int main()
-{
-int choice;
-while(1)
-{
-printf("\n1. Encrypt Text");
-printf("\n2. Decrypt Text");
-printf("\n3. Exit");
-printf("\n\nEnter Your Choice : ");
-scanf("%d",&choice);
-if(choice == 3)
-exit(0);
-else if(choice == 1)
-encipher();
-else if(choice == 2)
-decipher();
-else
-printf("Please Enter Valid Option.");
+
+int main() {
+    int choice;
+    while (1) {
+        printf("\n1. Encrypt Text");
+        printf("\n2. Decrypt Text");
+        printf("\n3. Exit");
+        printf("\n\nEnter Your Choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                encipher();
+                break;
+            case 2:
+                decipher();
+                break;
+            case 3:
+                exit(0);
+            default:
+                printf("Please Enter a Valid Option.");
+        }
+    }
 }
+
+void encipher() {
+    unsigned int i, j;
+    char input[50], key[10];
+    
+    // Clear input buffer
+    while (getchar() != '\n');
+    
+    printf("\nEnter Plain Text: ");
+    fgets(input, sizeof(input), stdin);
+    input[strcspn(input, "\n")] = 0; // Remove newline character
+    
+    printf("\nEnter Key Value: ");
+    fgets(key, sizeof(key), stdin);
+    key[strcspn(key, "\n")] = 0; // Remove newline character
+    
+    printf("\nResultant Cipher Text: ");
+    for (i = 0, j = 0; i < strlen(input); i++, j++) {
+        if (j >= strlen(key)) {
+            j = 0;
+        }
+        // Encrypt character
+        printf("%c", 65 + (((toupper(input[i]) - 65) + (toupper(key[j]) - 65)) % 26));
+    }
+    printf("\n");
 }
-void encipher()
-{
-unsigned int i,j;
-char input[50],key[10];
-printf("\n\nEnter Plain Text: ");
-scanf("%s",input);
-printf("\nEnter Key Value: ");
-scanf("%s",key);
-printf("\nResultant Cipher Text: ");
-for(i=0,j=0;i<strlen(input);i++,j++)
-{
-if(j>=strlen(key))
-{ j=0;
+
+void decipher() {
+    unsigned int i, j;
+    char input[50], key[10];
+    int value;
+    
+    // Clear input buffer
+    while (getchar() != '\n');
+    
+    printf("\nEnter Cipher Text: ");
+    fgets(input, sizeof(input), stdin);
+    input[strcspn(input, "\n")] = 0; // Remove newline character
+    
+    printf("\nEnter Key Value: ");
+    fgets(key, sizeof(key), stdin);
+    key[strcspn(key, "\n")] = 0; // Remove newline character
+    
+    printf("\nResultant Plain Text: ");
+    for (i = 0, j = 0; i < strlen(input); i++, j++) {
+        if (j >= strlen(key)) {
+            j = 0;
+        }
+        // Decrypt character
+        value = (toupper(input[i]) - 65) - (toupper(key[j]) - 65);
+        if (value < 0) {
+            value += 26; // Ensure result is positive
+        }
+        printf("%c", 65 + (value % 26));
+    }
+    printf("\n");
 }
-printf("%c",65+(((toupper(input[i])-65)+(toupper(key[j])-
-65))%26));
-}}
-void decipher()
-{
-unsigned int i,j;
-char input[50],key[10];
-int value;
-printf("\n\nEnter Cipher Text: ");
-scanf("%s",input);
-printf("\n\nEnter the key value: ");
-scanf("%s",key);
-for(i=0,j=0;i<strlen(input);i++,j++)
-{
-if(j>=strlen(key))
-{ j=0; }
-value = (toupper(input[i])-64)-(toupper(key[j])-64);
-if( value < 0)
-{ value = value * -1;
-}
-printf("%c",65 + (value % 26));
-}
-return 0;
-}
+
 ~~~
 ## OUTPUT:
 ![Screenshot 2024-09-04 140704](https://github.com/user-attachments/assets/e59f83fa-8d0b-44a4-92cc-f8788a84f483)
@@ -418,49 +471,70 @@ Testing algorithm with different key values.
 
 ## PROGRAM:
 ~~~
-#include<stdio.h>
-#include<conio.h>
-#include<string.h>
-int main()
-{
-int i,j,k,l;
-char a[20],c[20],d[20];
-printf("\n\t\t RAIL FENCE TECHNIQUE");
-printf("\n\nEnter the input string : ");
-gets(a);
-l=strlen(a);
-for(i=0,j=0;i<l;i++)
-{
-if(i%2==0)
-c[j++]=a[i];
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_LENGTH 20
+
+void railFenceEncryption(char *input, char *output) {
+    int length = strlen(input);
+    int i, j = 0;
+
+    // Apply rail fence encryption
+    for (i = 0; i < length; i++) {
+        if (i % 2 == 0) {
+            output[j++] = input[i];
+        }
+    }
+    for (i = 0; i < length; i++) {
+        if (i % 2 == 1) {
+            output[j++] = input[i];
+        }
+    }
+    output[j] = '\0';  // Null-terminate the string
 }
-for(i=0;i<l;i++)
-{
-if(i%2==1)
-c[j++]=a[i];
+
+void railFenceDecryption(char *cipherText, char *decryptedText) {
+    int length = strlen(cipherText);
+    int k, i, j = 0;
+
+    // Calculate the split point
+    if (length % 2 == 0) {
+        k = length / 2;
+    } else {
+        k = (length / 2) + 1;
+    }
+
+    // Reconstruct the original string
+    for (i = 0; i < k; i++) {
+        decryptedText[j] = cipherText[i];
+        j += 2;
+    }
+    j = 1;
+    for (i = k; i < length; i++) {
+        decryptedText[j] = cipherText[i];
+        j += 2;
+    }
+    decryptedText[length] = '\0';  // Null-terminate the string
 }
-c[j]='\0';
-printf("\nCipher text after applying rail fence :");
-printf("\n%s",c);
-if(l%2==0)
-k=l/2;
-else
-k=(l/2)+1;
-for(i=0,j=0;i<k;i++)
-{
-d[j]=c[i];
-j=j+2;
+
+int main() {
+    char input[MAX_LENGTH], cipherText[MAX_LENGTH], decryptedText[MAX_LENGTH];
+
+    printf("\n\t\tRAIL FENCE TECHNIQUE");
+    printf("\n\nEnter the input string (up to 19 characters): ");
+    fgets(input, sizeof(input), stdin);
+    input[strcspn(input, "\n")] = '\0';  // Remove newline character
+
+    railFenceEncryption(input, cipherText);
+    printf("\nCipher text after applying rail fence: %s\n", cipherText);
+
+    railFenceDecryption(cipherText, decryptedText);
+    printf("Text after decryption: %s\n", decryptedText);
+
+    return 0;
 }
-for(i=k,j=1;i<l;i++)
-{
-d[j]=c[i];
-j=j+2;
-}
-d[l]='\0';
-printf("\nText after decryption : ");
-printf("%s",d);
-return 0;
-}
+
 ~~~
 ## OUTPUT:
 ![Screenshot 2024-09-04 140937](https://github.com/user-attachments/assets/96023545-f45a-49e8-9d5b-500cb7b3c9da)
