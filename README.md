@@ -92,7 +92,7 @@ Implementation using C or pyhton code
 Testing algorithm with different key values. 
 
 ## PROGRAM:
-```
+
 ~~~
 #include <stdio.h>
 #include <string.h>
@@ -214,7 +214,6 @@ int main() {
     }
     return 0;
 }
-```
 ~~~
 ## OUTPUT:
 ![Screenshot 2024-09-04 140219](https://github.com/user-attachments/assets/f388f738-859e-436f-831c-f18f4de485f4)
